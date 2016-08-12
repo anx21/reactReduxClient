@@ -16,9 +16,14 @@ import Welcome from './components/welcome';
 import requireAuth from './components/auth/require_auth';
 import reducers from './reducers';
 import { AUTH_USER } from './actions/types';
+import createSocketIoMiddleware from 'redux-socket.io';
+import io from 'socket.io-client';
 
-const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore);
+const socket = io('http://localhost:3090');
+const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
+const createStoreWithMiddleware = applyMiddleware(reduxThunk, socketIoMiddleware)(createStore);
 const store = createStoreWithMiddleware(reducers);
+
 const token = localStorage.getItem('token');
 
 if (token) {

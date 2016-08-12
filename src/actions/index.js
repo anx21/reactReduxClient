@@ -6,6 +6,7 @@ import {
   RESET_PASSWORD_INIT,
   RESET_PASSWORD_END,
   CLEAR_ERROR,
+  CHAT_ERROR,
 } from '../actions/types';
 import axios from 'axios';
 import { browserHistory } from 'react-router';
@@ -15,6 +16,13 @@ const ROOT_URL = 'http://localhost:3090';
 export function authError(error) {
   return {
     type: AUTH_ERROR,
+    payload: error,
+  };
+}
+
+export function chatError(error) {
+  return {
+    type: CHAT_ERROR,
     payload: error,
   };
 }
@@ -123,3 +131,45 @@ export function resetPasswordEnd({ password, token }) {
     });
   };
 }
+
+export function createMessage(message) {
+  return dispatch => {
+    axios.post(`${ROOT_URL}/newmessage`, { message })
+    .then(response => {
+      dispatch({
+        type: RESET_PASSWORD_END,
+        payload: response.data.message,
+      });
+    })
+    .catch(error => {
+      dispatch(authError(error.response.data.error));
+    });
+  };
+}
+
+export function registerSocket(email) {
+  return dispatch => {
+    axios.post(`${ROOT_URL}/registerSocket`, { email })
+    .then(() => {
+      dispatch({ type: 'server/hello', data: 'Hello!' });
+    })
+    .catch(error => {
+      dispatch(chatError(error.response.data.error));
+    });
+  };
+}
+
+/*
+export function createChannel(channel) {
+  return dispatch => {
+    dispatch(addChannel(channel))
+    return fetch ('/api/channels/new_channel', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(channel)})
+      .catch(error => {throw error});
+  }
+}
+*/
